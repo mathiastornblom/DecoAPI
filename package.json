@@ -1,6 +1,15 @@
 {
   "name": "decoapiwrapper",
+  "displayName": "Deco API Wrapper",
+  "description": "Typescript Wrapper for consuming Deco routers as endpoints",
+  "repository": "github:mathiastornblom/decoapiwrapper",
+  "bugs": {
+    "url": "https://github.com/mathiastornblom/decoapiwrapper/issues"
+  },
   "version": "1.0.0",
+  "keywords": [],
+  "author": "Mathias Törnblom",
+  "license": "MIT",
   "main": "dist/client.js",
   "types": "dist/client.d.ts",
   "files": [
@@ -18,7 +27,7 @@
     "@types/bn.js": "^5.1.5",
     "@types/debug": "^4.1.12",
     "@types/jest": "^29.5.12",
-    "@types/node": "^22.4.2",
+    "@types/node": "^22.5.0",
     "@types/ping": "^0.4.4",
     "@types/qs": "^6.9.15",
     "@types/tough-cookie": "^4.0.5",
@@ -40,5 +49,9 @@
     "dotenv": "^16.4.5",
     "ping": "^0.4.4",
     "tough-cookie": "^4.1.4"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/mathiastornblom"
   }
 }

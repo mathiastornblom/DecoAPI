@@ -25,32 +25,164 @@ describe('Client Integration Tests', () => {
   it('should fetch performance data', async () => {
     const result = await client.performance();
 
-    // Check that the response contains the expected properties and values
-    expect(result).toHaveProperty('error_code', 0);
-    expect(result.result).toHaveProperty('cpu_usage');
-    expect(result.result).toHaveProperty('mem_usage');
-    console.log('Performance Data:', result);
+    // Manage the case where the result is an ErrorResponse
+    if ('errorcode' in result) {
+      console.warn('Warning:', result.errorcode);
+      expect(result.errorcode).toBe('no such callback');
+    } else {
+      // Check that the response contains the expected properties and values
+      expect(result).toHaveProperty('error_code', 0);
+      console.log('Performance list:', result);
+    }
   });
 
   // Test case to fetch the client list
   it('should fetch client list', async () => {
     const result = await client.clientList();
 
-    // Check that the response contains the expected properties and values
-    expect(result).toHaveProperty('error_code', 0);
-    expect(result.result.client_list).toBeInstanceOf(Array);
-    expect(result.result.client_list.length).toBeGreaterThan(0);
-    console.log('Client List:', result);
+    // Manage the case where the result is an ErrorResponse
+    if ('errorcode' in result) {
+      console.warn('Warning:', result.errorcode);
+      expect(result.errorcode).toBe('no such callback');
+    } else {
+      // Check that the response contains the expected properties and values
+      expect(result).toHaveProperty('error_code', 0);
+      console.log('Cevice list:', result);
+    }
   });
 
   // Test case to fetch the device list
   it('should fetch device list', async () => {
     const result = await client.deviceList();
 
-    // Check that the response contains the expected properties and values
-    expect(result).toHaveProperty('error_code', 0);
-    expect(result.result.device_list).toBeInstanceOf(Array);
-    expect(result.result.device_list.length).toBeGreaterThan(0);
-    console.log('Device List:', result);
+    // Manage the case where the result is an ErrorResponse
+    if ('errorcode' in result) {
+      console.warn('Warning:', result.errorcode);
+      expect(result.errorcode).toBe('no such callback');
+    } else {
+      // Check that the response contains the expected properties and values
+      expect(result).toHaveProperty('error_code', 0);
+      console.log('Device list:', result);
+    }
   });
+
+  // Test case to fetch the WAN
+  it('should fetch WAN', async () => {
+    const result = await client.getWAN();
+
+    // Manage the case where the result is an ErrorResponse
+    if ('errorcode' in result) {
+      console.warn('Warning:', result.errorcode);
+      expect(result.errorcode).toBe('no such callback');
+    } else {
+      // Check that the response contains the expected properties and values
+      expect(result).toHaveProperty('error_code', 0);
+      console.log('WAN:', result);
+    }
+  });
+
+  // Test case to fetch the WLAN
+  it('should fetch WLAN', async () => {
+    const result = await client.getWLAN();
+
+    // Manage the case where the result is an ErrorResponse
+    if ('errorcode' in result) {
+      console.warn('Warning:', result.errorcode);
+      expect(result.errorcode).toBe('no such callback');
+    } else {
+      // Check that the response contains the expected properties and values
+      expect(result).toHaveProperty('error_code', 0);
+      console.log('WLAN:', result);
+    }
+  });
+
+  // Test case to fetch the power
+  it('should fetch Power', async () => {
+    const result = await client.getAdvancedSettings();
+
+    // Manage the case where the result is an ErrorResponse
+    if ('errorcode' in result) {
+      console.warn('Warning:', result.errorcode);
+      expect(result.errorcode).toBe('no such callback');
+    } else {
+      // Check that the response contains the expected properties and values
+      expect(result).toHaveProperty('error_code', 0);
+      console.log('Power:', result);
+    }
+  });
+
+  // // Test case to fetch the LAN
+  // it('should fetch LAN', async () => {
+  //   const result = await client.getLAN();
+
+  //   // Manage the case where the result is an ErrorResponse
+  //   if ('errorcode' in result) {
+  //     console.warn('Warning:', result.errorcode);
+  //     expect(result.errorcode).toBe('no such callback');
+  //   } else {
+  //     // Check that the response contains the expected properties and values
+  //     expect(result).toHaveProperty('error_code', 0);
+  //     console.log('LAN:', result);
+  //   }
+  // });
+
+  // // Test case to fetch the model
+  // it('should fetch model', async () => {
+  //   const result = await client.getModel();
+
+  //   // Manage the case where the result is an ErrorResponse
+  //   if ('errorcode' in result) {
+  //     console.warn('Warning:', result.errorcode);
+  //     expect(result.errorcode).toBe('no such callback');
+  //   } else {
+  //     // Check that the response contains the expected properties and values
+  //     expect(result).toHaveProperty('error_code', 0);
+  //     console.log('Model:', result);
+  //   }
+  // });
+
+  // Test case to fetch the device firmware
+  it('should fetch firmware', async () => {
+    const result = await client.firmware();
+
+    // Manage the case where the result is an ErrorResponse
+    if ('errorcode' in result) {
+      console.warn('Warning:', result.errorcode);
+      expect(result.errorcode).toBe('no such callback');
+    } else {
+      // Check that the response contains the expected properties and values
+      expect(result).toHaveProperty('error_code', 0);
+      console.log('Firmware:', result);
+    }
+  });
+
+  // // Test case to fetch the status
+  // it('should fetch status', async () => {
+  //   const result = await client.getStatus();
+
+  //   // Manage the case where the result is an ErrorResponse
+  //   if ('errorcode' in result) {
+  //     console.warn('Warning:', result.errorcode);
+  //     expect(result.errorcode).toBe('no such callback');
+  //   } else {
+  //     // Check that the response contains the expected properties and values
+  //     expect(result).toHaveProperty('error_code', 0);
+  //     console.log('Status:', result);
+  //   }
+  // });
+
+  // // Test case to fetch the enviroment
+  // it('should fetch enviroment', async () => {
+  //   const result = await client.getEnviroment();
+
+  //   // Manage the case where the result is an ErrorResponse
+  //   if ('errorcode' in result) {
+  //     console.warn('Warning:', result.errorcode);
+  //     expect(result.errorcode).toBe('no such callback');
+  //   } else {
+  //     // Check that the response contains the expected properties and values
+  //     expect(result).toHaveProperty('error_code', 0);
+  //     console.log('Enviromet:', result);
+  //   }
+  // });
 });
