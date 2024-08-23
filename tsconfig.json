@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES6", // Välj ECMAScript-versionen som utdata ska vara kompatibel med
+    "module": "commonjs", // Modulsystemet som används (commonjs är vanligt i Node.js-projekt)
+    "rootDir": "./src", // Rotmappen för källkoden
+    "outDir": "./dist", // Output-mappen för den kompilerade koden
+    "strict": true, // Aktiverar strikta typkontroller
+    "esModuleInterop": true, // Gör det enklare att importera CommonJS-moduler i ES6-format
+    "forceConsistentCasingInFileNames": true, // Forcerar konsekvent användning av filnamnens bokstavsstorlek
+    "skipLibCheck": true, // Hoppar över typkontroll av definitioner i node_modules
+    "sourceMap": true,
+    "declaration": true
+  },
+  "include": ["src/**/*", "tests/client.test.ts"],
+  "exclude": ["node_modules", "**/*.test.ts"]
+}
