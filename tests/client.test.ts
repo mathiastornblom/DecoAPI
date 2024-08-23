@@ -1,4 +1,4 @@
-import Client from '../src/client';
+import DecoAPIWraper from '../src/client';
 import * as dotenv from 'dotenv';
 
 // Load environment variables from the .env file
@@ -7,7 +7,7 @@ dotenv.config();
 describe('Client Integration Tests', () => {
   // Retrieve Deco password and IP address from environment variables
   const decoPassword = process.env.DECO_PASSWORD || '';
-  const client = new Client(process.env.DECO_IP || '');
+  const client = new DecoAPIWraper(process.env.DECO_IP || '');
 
   // Test case to verify successful authentication
   it('should authenticate successfully', async () => {
