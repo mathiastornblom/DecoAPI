@@ -5,7 +5,7 @@ import {
   AES128Encrypt,
   AES128Decrypt,
 } from './utils/aes';
-import axios, { AxiosInstance } from 'axios';
+import { AxiosInstance } from 'axios';
 import { KeyObject } from 'crypto';
 import { url } from 'inspector';
 
@@ -241,25 +241,4 @@ export default class Deco {
       throw err;
     }
   }
-}
-
-// Function to extract and print details from an RSA KeyObject
-function printKey(keyObject: KeyObject): string {
-  // Export the key as a DER-encoded buffer
-  const keyBuffer = keyObject.export({ type: 'pkcs1', format: 'der' });
-
-  // The modulus for RSA keys is stored in the first part of the key structure
-  // Parse the modulus by skipping the header bytes in the DER-encoded key
-  const modulusOffset = 29; // Skip the header bytes (this offset can vary slightly)
-  const modulusLength = keyBuffer.readUInt16BE(modulusOffset - 2); // Read the modulus length
-
-  // Extract the modulus
-  const modulus = keyBuffer.slice(modulusOffset, modulusOffset + modulusLength);
-
-  return (
-    'Modulus (hex): ' +
-    modulus.toString('hex') +
-    'Exponent: ' +
-    keyObject.asymmetricKeyDetails?.publicExponent
-  );
 }

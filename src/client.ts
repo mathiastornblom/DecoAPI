@@ -94,14 +94,6 @@ interface LoginRequest {
   operation: string;
 }
 
-// Interface to define the structure of the response for login
-interface LoginResponse {
-  error_code: number;
-  result: {
-    stok: string;
-  };
-}
-
 // Interface for generic request parameters
 interface RequestParams {
   operation?: string;

@@ -11,7 +11,6 @@ const ErrInvalidBlockSize = new Error('invalid blocksize');
 const ErrInvalidPKCS7Data = new Error(
   'invalid PKCS7 data (empty or not padded)',
 );
-const ErrInvalidPKCS7Padding = new Error('invalid padding on input');
 
 // Function to generate a random AES-128 key and initialization vector (IV)
 export function generateAESKey(): AESKey {
@@ -95,22 +94,4 @@ function pkcs7Padding(buffer: Buffer, blockSize: number): Buffer {
   const paddingSize = blockSize - (buffer.length % blockSize);
   const padding = Buffer.alloc(paddingSize, paddingSize);
   return Buffer.concat([buffer, padding]);
-}
-
-// Function to remove PKCS7 padding from a buffer
-function pkcs7Unpadding(buffer: Buffer, blockSize: number): Buffer {
-  if (blockSize <= 0) throw ErrInvalidBlockSize;
-  if (buffer.length === 0) throw ErrInvalidPKCS7Data;
-  if (buffer.length % blockSize !== 0) throw ErrInvalidPKCS7Padding;
-
-  const paddingSize = buffer[buffer.length - 1];
-  if (paddingSize === 0 || paddingSize > buffer.length)
-    throw ErrInvalidPKCS7Padding;
-
-  for (let i = 0; i < paddingSize; i++) {
-    if (buffer[buffer.length - 1 - i] !== paddingSize)
-      throw ErrInvalidPKCS7Padding;
-  }
-
-  return buffer.slice(0, -paddingSize);
 }

@@ -13,6 +13,7 @@
     "lint:fix": "eslint 'src/**/*.{ts,tsx}' --fix"
   },
   "devDependencies": {
+    "@eslint/js": "^9.9.0",
     "@types/axios": "^0.14.0",
     "@types/bn.js": "^5.1.5",
     "@types/debug": "^4.1.12",
@@ -24,9 +25,11 @@
     "eslint": "^9.9.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.9.0",
     "jest": "^29.7.0",
     "prettier": "^3.3.3",
-    "ts-jest": "^29.2.4"
+    "ts-jest": "^29.2.4",
+    "typescript-eslint": "^8.2.0"
   },
   "dependencies": {
     "asn1.js": "^5.4.1",
