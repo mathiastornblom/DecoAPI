@@ -26,10 +26,12 @@ npm install
 
 Provide a brief description of how to use the project. For example:
 
+```bash
 import DecoAPIWraper from 'decoapiwrapper';
 
 const client = new DecoAPIWraper(process.env.DECO_IP || '');
 await client.authenticate(decoPassword);
+```
 
 ### Environment Variables
 
