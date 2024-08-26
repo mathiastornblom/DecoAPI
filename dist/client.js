@@ -80,61 +80,273 @@ class DecoAPIWraper {
     authenticate(password) {
         return __awaiter(this, void 0, void 0, function* () {
             console.debug('Starting authentication process...');
+            let authenticated = false;
             const hostIsAlive = yield this.pingHost();
-            if (!hostIsAlive) {
-                throw new Error(`Host ${this.host} is not reachable.`);
-            }
-            // Generate AES key for encryption
-            this.aes = (0, aes_1.generateAESKey)();
-            console.debug(`AES Key generated: ${this.aes.key.toString('hex')}`);
-            console.debug(`AES IV generated: ${this.aes.iv.toString('hex')}`);
-            // Generate MD5 hash using the username and password
-            this.hash = crypto_1.default
-                .createHash('md5')
-                .update(`${userName}${password}`)
-                .digest('hex');
-            console.debug(`MD5 Hash generated: ${this.hash}`);
-            this.ensureDecoInstance();
-            console.debug('Attempting to retrieve password key...');
-            const passwordKey = yield this.decoInstance.getPasswordKey();
-            if (!passwordKey) {
-                throw new Error('Failed to retrieve password key.');
-            }
-            console.debug('Password key retrieved successfully:', passwordKey);
-            // Encrypt the password using the retrieved password key
-            console.debug('Encrypting password using password key...');
-            const encryptedPassword = (0, rsa_1.encryptRsa)(password, passwordKey);
-            console.debug(`Encrypted password: ${encryptedPassword}`);
-            console.debug('Attempting to retrieve session key...');
-            const { key: sessionKey, seq: sequence } = yield this.decoInstance.getSessionKey();
-            if (!sessionKey) {
-                throw new Error('Failed to retrieve session key.');
-            }
-            console.debug(`Session key retrieved successfully: ${printKey(sessionKey)}), Sequence: ${sequence.toString()}`);
-            // Update RSA key and sequence
-            this.rsa = sessionKey;
-            this.sequence = sequence;
-            // Additional Logging for Debugging
-            console.debug('Checking RSA key after session key retrieval:', this.rsa);
-            // Continue with the login process...
-            const loginReq = {
-                params: {
-                    password: encryptedPassword,
-                },
-                operation: 'login',
-            };
-            const loginJSON = JSON.stringify(loginReq);
-            console.debug(`Login request JSON: ${loginJSON}`);
-            const args = new EndpointArgs('login');
-            console.debug('Sending login request...');
             try {
-                const result = yield this.decoInstance.doEncryptedPost(';stok=/login', args, Buffer.from(loginJSON), true, sessionKey, this.sequence);
-                this.stok = result.result.stok;
-                console.debug(`Login successful. STOK: ${this.stok}`);
+                if (!hostIsAlive) {
+                    throw new Error(`Host ${this.host} is not reachable.`);
+                }
+                // Generate AES key for encryption
+                this.aes = (0, aes_1.generateAESKey)();
+                console.debug(`AES Key generated: ${this.aes.key.toString('hex')}`);
+                console.debug(`AES IV generated: ${this.aes.iv.toString('hex')}`);
+                // Generate MD5 hash using the username and password
+                this.hash = crypto_1.default
+                    .createHash('md5')
+                    .update(`${userName}${password}`)
+                    .digest('hex');
+                console.debug(`MD5 Hash generated: ${this.hash}`);
+                this.ensureDecoInstance();
+                console.debug('Attempting to retrieve password key...');
+                const passwordKey = yield this.decoInstance.getPasswordKey();
+                if (!passwordKey) {
+                    throw new Error('Failed to retrieve password key.');
+                }
+                console.debug('Password key retrieved successfully:', passwordKey);
+                // Encrypt the password using the retrieved password key
+                console.debug('Encrypting password using password key...');
+                const encryptedPassword = (0, rsa_1.encryptRsa)(password, passwordKey);
+                console.debug(`Encrypted password: ${encryptedPassword}`);
+                console.debug('Attempting to retrieve session key...');
+                const { key: sessionKey, seq: sequence } = yield this.decoInstance.getSessionKey();
+                if (!sessionKey) {
+                    throw new Error('Failed to retrieve session key.');
+                }
+                console.debug(`Session key retrieved successfully: ${printKey(sessionKey)}), Sequence: ${sequence.toString()}`);
+                // Update RSA key and sequence
+                this.rsa = sessionKey;
+                this.sequence = sequence;
+                // Additional Logging for Debugging
+                console.debug('Checking RSA key after session key retrieval:', this.rsa);
+                // Continue with the login process...
+                const loginReq = {
+                    params: {
+                        password: encryptedPassword + '&confirm=true',
+                    },
+                    operation: 'login',
+                };
+                const loginJSON = JSON.stringify(loginReq);
+                console.debug(`Login request JSON: ${loginJSON}`);
+                const args = new EndpointArgs('login');
+                console.debug('Sending login request...');
+                try {
+                    const result = yield this.decoInstance.doEncryptedPost(';stok=/login', args, Buffer.from(loginJSON), true, sessionKey, this.sequence);
+                    this.stok = result.result.stok;
+                    console.debug(`Login successful. STOK: ${this.stok}`);
+                    authenticated = true;
+                }
+                catch (e) {
+                    console.debug(e);
+                    return authenticated;
+                }
+                return authenticated;
             }
-            catch (e) {
-                console.debug(e);
+            catch (_a) {
+                return authenticated;
             }
+        });
+    }
+    // Public method to retrieve Wan data
+    getAdvancedSettings() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.debug('Requesting advanced data...');
+            const args = new EndpointArgs('power');
+            const decoInstance = new deco_1.default(this.aes, this.hash, this.rsa, this.sequence, this.c);
+            const response = (yield decoInstance.doEncryptedPost(`;stok=${this.stok}/admin/wireless`, args, Buffer.from(JSON.stringify({ operation: 'read' })), false));
+            // Chech if error
+            if (response &&
+                typeof response === 'object' &&
+                'errorcode' in response &&
+                'success' in response) {
+                const errorResponse = {
+                    errorcode: response.errorcode,
+                    success: response.success,
+                };
+                console.error('Advanced request failed:', errorResponse);
+                return errorResponse;
+            }
+            return response;
+        });
+    }
+    // Public method to retrieve Wan data
+    getWLAN() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.debug('Requesting status data...');
+            const args = new EndpointArgs('wlan');
+            const decoInstance = new deco_1.default(this.aes, this.hash, this.rsa, this.sequence, this.c);
+            const response = (yield decoInstance.doEncryptedPost(`;stok=${this.stok}/admin/wireless`, args, Buffer.from(JSON.stringify({ operation: 'read' })), false));
+            // Chech if error
+            if (response &&
+                typeof response === 'object' &&
+                'errorcode' in response &&
+                'success' in response) {
+                const errorResponse = {
+                    errorcode: response.errorcode,
+                    success: response.success,
+                };
+                console.error('WLAN request failed:', errorResponse);
+                return errorResponse;
+            }
+            // If no error do respond with result
+            const decodeBase64 = (encoded) => {
+                try {
+                    return Buffer.from(encoded, 'base64').toString('utf-8');
+                }
+                catch (e) {
+                    console.error(`Failed to decode base64 string: ${encoded}`, e);
+                    return encoded; // Returnera den ursprungliga strängen om dekodning misslyckas
+                }
+            };
+            // Dekodera band5_1
+            response.result.band5_1.guest.ssid = decodeBase64(response.result.band5_1.guest.ssid);
+            response.result.band5_1.guest.password = decodeBase64(response.result.band5_1.guest.password);
+            response.result.band5_1.host.ssid = decodeBase64(response.result.band5_1.host.ssid);
+            response.result.band5_1.host.password = decodeBase64(response.result.band5_1.host.password);
+            // Dekodera band2_4
+            response.result.band2_4.guest.ssid = decodeBase64(response.result.band2_4.guest.ssid);
+            response.result.band2_4.guest.password = decodeBase64(response.result.band2_4.guest.password);
+            response.result.band2_4.host.ssid = decodeBase64(response.result.band2_4.host.ssid);
+            response.result.band2_4.host.password = decodeBase64(response.result.band2_4.host.password);
+            console.debug('Processed WLAN network response: ', JSON.stringify(response));
+            return response;
+        });
+    }
+    // Public method to retrieve LAN data
+    getLAN() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.debug('Requesting status data...');
+            const args = new EndpointArgs('lan_ip');
+            const decoInstance = new deco_1.default(this.aes, this.hash, this.rsa, this.sequence, this.c);
+            const result = (yield decoInstance.doEncryptedPost(`;stok=${this.stok}/admin/network`, args, Buffer.from(JSON.stringify({ operation: 'read' })), false));
+            // Chech if error
+            if (result &&
+                typeof result === 'object' &&
+                'errorcode' in result &&
+                'success' in result) {
+                const errorResponse = {
+                    errorcode: result.errorcode,
+                    success: result.success,
+                };
+                console.error('LAN request failed:', errorResponse);
+                return errorResponse;
+            }
+            // If no error do respond with result
+            return result;
+        });
+    }
+    // Public method to retrieve Wan data
+    getWAN() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.debug('Requesting status data...');
+            const args = new EndpointArgs('wan_ipv4');
+            const decoInstance = new deco_1.default(this.aes, this.hash, this.rsa, this.sequence, this.c);
+            const result = (yield decoInstance.doEncryptedPost(`;stok=${this.stok}/admin/network`, args, Buffer.from(JSON.stringify({ operation: 'read' })), false));
+            // Chech if error
+            if (result &&
+                typeof result === 'object' &&
+                'errorcode' in result &&
+                'success' in result) {
+                const errorResponse = {
+                    errorcode: result.errorcode,
+                    success: result.success,
+                };
+                console.error('WAN request failed:', errorResponse);
+                return errorResponse;
+            }
+            // If no error do respond with result
+            return result;
+        });
+    }
+    // Public method to retrieve enviromet data
+    getModel() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.debug('Requesting status data...');
+            const args = new EndpointArgs('model');
+            const decoInstance = new deco_1.default(this.aes, this.hash, this.rsa, this.sequence, this.c);
+            const result = (yield decoInstance.doEncryptedPost(`;stok=${this.stok}/admin/device`, args, Buffer.from(JSON.stringify({ operation: 'read' })), false));
+            // Chech if error
+            if (result &&
+                typeof result === 'object' &&
+                'errorcode' in result &&
+                'success' in result) {
+                const errorResponse = {
+                    errorcode: result.errorcode,
+                    success: result.success,
+                };
+                console.error('Model request failed:', errorResponse);
+                return errorResponse;
+            }
+            // If no error do respond with result
+            return result;
+        });
+    }
+    // Public method to retrieve enviromet data
+    getEnviroment() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.debug('Requesting status data...');
+            const args = new EndpointArgs('envar');
+            const decoInstance = new deco_1.default(this.aes, this.hash, this.rsa, this.sequence, this.c);
+            const result = (yield decoInstance.doEncryptedPost(`;stok=${this.stok}/admin/system`, args, Buffer.from(JSON.stringify({ operation: 'read' })), false));
+            // Chech if error
+            if (result &&
+                typeof result === 'object' &&
+                'errorcode' in result &&
+                'success' in result) {
+                const errorResponse = {
+                    errorcode: result.errorcode,
+                    success: result.success,
+                };
+                console.error('Enviromet request failed:', errorResponse);
+                return errorResponse;
+            }
+            // If no error do respond with result
+            return result;
+        });
+    }
+    // Public method to retrieve status data
+    getStatus() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.debug('Requesting status data...');
+            const args = new EndpointArgs('all');
+            const decoInstance = new deco_1.default(this.aes, this.hash, this.rsa, this.sequence, this.c);
+            const result = (yield decoInstance.doEncryptedPost(`;stok=${this.stok}/admin/status`, args, Buffer.from(JSON.stringify({ operation: 'read' })), false));
+            // Chech if error
+            if (result &&
+                typeof result === 'object' &&
+                'errorcode' in result &&
+                'success' in result) {
+                const errorResponse = {
+                    errorcode: result.errorcode,
+                    success: result.success,
+                };
+                console.error('Status request failed:', errorResponse);
+                return errorResponse;
+            }
+            // If no error do respond with result
+            return result;
+        });
+    }
+    // Public method to retrieve firmware data
+    firmware() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.debug('Requesting firmware data...');
+            const args = new EndpointArgs('upgrade');
+            const decoInstance = new deco_1.default(this.aes, this.hash, this.rsa, this.sequence, this.c);
+            const result = (yield decoInstance.doEncryptedPost(`;stok=${this.stok}/admin/firmware`, args, Buffer.from(JSON.stringify({ operation: 'read' })), false));
+            // Chech if error
+            if (result &&
+                typeof result === 'object' &&
+                'errorcode' in result &&
+                'success' in result) {
+                const errorResponse = {
+                    errorcode: result.errorcode,
+                    success: result.success,
+                };
+                console.error('Firmware request failed:', errorResponse);
+                return errorResponse;
+            }
+            // If no error do respond with result
+            return result;
         });
     }
     // Public method to retrieve performance data
@@ -143,7 +355,14 @@ class DecoAPIWraper {
             console.debug('Requesting performance data...');
             const args = new EndpointArgs('performance');
             const decoInstance = new deco_1.default(this.aes, this.hash, this.rsa, this.sequence, this.c);
-            return (yield decoInstance.doEncryptedPost(`;stok=${this.stok}/admin/network`, args, Buffer.from(JSON.stringify({ operation: 'read' })), false));
+            const result = (yield decoInstance.doEncryptedPost(`;stok=${this.stok}/admin/network`, args, Buffer.from(JSON.stringify({ operation: 'read' })), false));
+            // Check if result is an error
+            if (isErrorResponse(result)) {
+                console.error('Performance request failed:', result);
+                return result;
+            }
+            // If no error do respond with result
+            return result;
         });
     }
     // Public method to retrieve the list of devices
@@ -152,7 +371,14 @@ class DecoAPIWraper {
             console.debug('Requesting device list...');
             const args = new EndpointArgs('device_list');
             const decoInstance = new deco_1.default(this.aes, this.hash, this.rsa, this.sequence, this.c);
-            return (yield decoInstance.doEncryptedPost(`;stok=${this.stok}/admin/device`, args, Buffer.from(JSON.stringify({ operation: 'read' })), false));
+            const result = (yield decoInstance.doEncryptedPost(`;stok=${this.stok}/admin/device`, args, Buffer.from(JSON.stringify({ operation: 'read' })), false));
+            // Check if result is an error
+            if (isErrorResponse(result)) {
+                console.error('device list request failed:', result);
+                return result;
+            }
+            // If no error do respond with result
+            return result;
         });
     }
     // Public method to retrieve the list of clients
@@ -168,17 +394,28 @@ class DecoAPIWraper {
             console.debug(`Client list request JSON: ${jsonRequest}`);
             const decoInstance = new deco_1.default(this.aes, this.hash, this.rsa, this.sequence, this.c);
             const result = (yield decoInstance.doEncryptedPost(`;stok=${this.stok}/admin/client`, args, Buffer.from(jsonRequest), false));
+            // Check if result is an error
+            if (isErrorResponse(result)) {
+                console.error('client list request failed:', result);
+                return result;
+            }
             console.debug('Processing client list response...');
-            for (const client of result.result.client_list) {
+            // Uppdatera client_list med dekodade namn
+            result.result.client_list.forEach((client) => {
                 try {
+                    // Försök att dekoda namnet
                     const decodedName = Buffer.from(client.name, 'base64').toString('utf-8');
+                    console.debug(`Decoded client name: ${decodedName}`);
+                    // Sätt det dekodade namnet till klienten
                     client.name = decodedName;
-                    console.debug(`Decoded client name: ${client.name}`);
                 }
                 catch (e) {
+                    // Logga fel om dekodningen misslyckas
                     console.error(`Failed to decode client name: ${client.name}`, e);
                 }
-            }
+            });
+            console.debug('Processed client list response: ', JSON.stringify(result));
+            // Returnera det uppdaterade resultatet
             return result;
         });
     }
@@ -205,7 +442,13 @@ class DecoAPIWraper {
         return __awaiter(this, void 0, void 0, function* () {
             console.debug(`Sending custom request to path: ${path}`);
             const decoInstance = new deco_1.default(this.aes, this.hash, this.rsa, this.sequence, this.c);
-            return yield decoInstance.doEncryptedPost(`;stok=${this.stok}${path}`, params, body, false);
+            const result = (yield decoInstance.doEncryptedPost(`;stok=${this.stok}${path}`, params, body, false));
+            // Check if result is an error
+            if (isErrorResponse(result)) {
+                console.error('client list request failed:', result);
+                return result;
+            }
+            return result;
         });
     }
 }
@@ -225,5 +468,14 @@ function printKey(keyObject) {
         modulus.toString('hex') +
         'Exponent: ' +
         ((_a = keyObject.asymmetricKeyDetails) === null || _a === void 0 ? void 0 : _a.publicExponent));
+}
+// Type guard för att kontrollera om ett objekt är av typen ErrorResponse
+function isErrorResponse(result) {
+    return (typeof result === 'object' &&
+        result !== null &&
+        'errorcode' in result &&
+        'success' in result &&
+        typeof result.errorcode === 'string' &&
+        typeof result.success === 'boolean');
 }
 //# sourceMappingURL=client.js.map

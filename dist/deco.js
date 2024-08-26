@@ -167,20 +167,4 @@ class Deco {
     }
 }
 exports.default = Deco;
-// Function to extract and print details from an RSA KeyObject
-function printKey(keyObject) {
-    var _a;
-    // Export the key as a DER-encoded buffer
-    const keyBuffer = keyObject.export({ type: 'pkcs1', format: 'der' });
-    // The modulus for RSA keys is stored in the first part of the key structure
-    // Parse the modulus by skipping the header bytes in the DER-encoded key
-    const modulusOffset = 29; // Skip the header bytes (this offset can vary slightly)
-    const modulusLength = keyBuffer.readUInt16BE(modulusOffset - 2); // Read the modulus length
-    // Extract the modulus
-    const modulus = keyBuffer.slice(modulusOffset, modulusOffset + modulusLength);
-    return ('Modulus (hex): ' +
-        modulus.toString('hex') +
-        'Exponent: ' +
-        ((_a = keyObject.asymmetricKeyDetails) === null || _a === void 0 ? void 0 : _a.publicExponent));
-}
 //# sourceMappingURL=deco.js.map

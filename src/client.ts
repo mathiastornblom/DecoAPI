@@ -283,86 +283,93 @@ export default class DecoAPIWraper {
   }
 
   // Public method to authenticate the client with the given password
-  public async authenticate(password: string): Promise<void> {
+  public async authenticate(password: string): Promise<boolean> {
     console.debug('Starting authentication process...');
+    let authenticated = false;
     const hostIsAlive = await this.pingHost();
-
-    if (!hostIsAlive) {
-      throw new Error(`Host ${this.host} is not reachable.`);
-    }
-
-    // Generate AES key for encryption
-    this.aes = generateAESKey();
-    console.debug(`AES Key generated: ${this.aes.key.toString('hex')}`);
-    console.debug(`AES IV generated: ${this.aes.iv.toString('hex')}`);
-
-    // Generate MD5 hash using the username and password
-    this.hash = crypto
-      .createHash('md5')
-      .update(`${userName}${password}`)
-      .digest('hex');
-    console.debug(`MD5 Hash generated: ${this.hash}`);
-
-    this.ensureDecoInstance();
-
-    console.debug('Attempting to retrieve password key...');
-    const passwordKey = await this.decoInstance!.getPasswordKey();
-    if (!passwordKey) {
-      throw new Error('Failed to retrieve password key.');
-    }
-    console.debug('Password key retrieved successfully:', passwordKey);
-
-    // Encrypt the password using the retrieved password key
-    console.debug('Encrypting password using password key...');
-    const encryptedPassword = encryptRsa(password, passwordKey!);
-    console.debug(`Encrypted password: ${encryptedPassword}`);
-
-    console.debug('Attempting to retrieve session key...');
-    const { key: sessionKey, seq: sequence } =
-      await this.decoInstance!.getSessionKey();
-    if (!sessionKey) {
-      throw new Error('Failed to retrieve session key.');
-    }
-    console.debug(
-      `Session key retrieved successfully: ${printKey(
-        sessionKey,
-      )}), Sequence: ${sequence.toString()}`,
-    );
-
-    // Update RSA key and sequence
-    this.rsa = sessionKey;
-    this.sequence = sequence;
-
-    // Additional Logging for Debugging
-    console.debug('Checking RSA key after session key retrieval:', this.rsa);
-
-    // Continue with the login process...
-    const loginReq: LoginRequest = {
-      params: {
-        password: encryptedPassword + '&confirm=true',
-      },
-      operation: 'login',
-    };
-
-    const loginJSON = JSON.stringify(loginReq);
-    console.debug(`Login request JSON: ${loginJSON}`);
-    const args = new EndpointArgs('login');
-
-    console.debug('Sending login request...');
     try {
-      const result = await this.decoInstance!.doEncryptedPost(
-        ';stok=/login',
-        args,
-        Buffer.from(loginJSON),
-        true,
-        sessionKey,
-        this.sequence,
+      if (!hostIsAlive) {
+        throw new Error(`Host ${this.host} is not reachable.`);
+      }
+
+      // Generate AES key for encryption
+      this.aes = generateAESKey();
+      console.debug(`AES Key generated: ${this.aes.key.toString('hex')}`);
+      console.debug(`AES IV generated: ${this.aes.iv.toString('hex')}`);
+
+      // Generate MD5 hash using the username and password
+      this.hash = crypto
+        .createHash('md5')
+        .update(`${userName}${password}`)
+        .digest('hex');
+      console.debug(`MD5 Hash generated: ${this.hash}`);
+
+      this.ensureDecoInstance();
+
+      console.debug('Attempting to retrieve password key...');
+      const passwordKey = await this.decoInstance!.getPasswordKey();
+      if (!passwordKey) {
+        throw new Error('Failed to retrieve password key.');
+      }
+      console.debug('Password key retrieved successfully:', passwordKey);
+
+      // Encrypt the password using the retrieved password key
+      console.debug('Encrypting password using password key...');
+      const encryptedPassword = encryptRsa(password, passwordKey!);
+      console.debug(`Encrypted password: ${encryptedPassword}`);
+
+      console.debug('Attempting to retrieve session key...');
+      const { key: sessionKey, seq: sequence } =
+        await this.decoInstance!.getSessionKey();
+      if (!sessionKey) {
+        throw new Error('Failed to retrieve session key.');
+      }
+      console.debug(
+        `Session key retrieved successfully: ${printKey(
+          sessionKey,
+        )}), Sequence: ${sequence.toString()}`,
       );
 
-      this.stok = result.result.stok;
-      console.debug(`Login successful. STOK: ${this.stok}`);
-    } catch (e) {
-      console.debug(e);
+      // Update RSA key and sequence
+      this.rsa = sessionKey;
+      this.sequence = sequence;
+
+      // Additional Logging for Debugging
+      console.debug('Checking RSA key after session key retrieval:', this.rsa);
+
+      // Continue with the login process...
+      const loginReq: LoginRequest = {
+        params: {
+          password: encryptedPassword + '&confirm=true',
+        },
+        operation: 'login',
+      };
+
+      const loginJSON = JSON.stringify(loginReq);
+      console.debug(`Login request JSON: ${loginJSON}`);
+      const args = new EndpointArgs('login');
+
+      console.debug('Sending login request...');
+      try {
+        const result = await this.decoInstance!.doEncryptedPost(
+          ';stok=/login',
+          args,
+          Buffer.from(loginJSON),
+          true,
+          sessionKey,
+          this.sequence,
+        );
+
+        this.stok = result.result.stok;
+        console.debug(`Login successful. STOK: ${this.stok}`);
+        authenticated = true;
+      } catch (e) {
+        console.debug(e);
+        return authenticated;
+      }
+      return authenticated;
+    } catch {
+      return authenticated;
     }
   }
 
