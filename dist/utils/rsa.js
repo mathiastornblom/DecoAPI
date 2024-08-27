@@ -31,6 +31,9 @@ exports.encryptRsa = encryptRsa;
 const crypto_1 = __importStar(require("crypto"));
 const asn1 = __importStar(require("asn1.js"));
 const bn_js_1 = __importDefault(require("bn.js"));
+const debug_1 = require("debug");
+const err = (0, debug_1.debug)('app:error');
+const log = (0, debug_1.debug)('app:log');
 // Define the ASN.1 structure for an RSA public key
 const RSAPublicKeyASN = asn1.define('RSAPublicKey', function () {
     this.seq().obj(this.key('n').int(), this.key('e').int());
@@ -42,14 +45,14 @@ const RSAPublicKeyASN = asn1.define('RSAPublicKey', function () {
  * @returns The generated RSA public key as a KeyObject or null if an error occurs.
  */
 function generateRsaKey(data) {
-    console.log('generateRsaKey: Starting RSA key generation.');
-    console.log(`generateRsaKey: Modulus (hex): ${data[0]}`);
-    console.log(`generateRsaKey: Exponent (hex): ${data[1]}`);
+    log('generateRsaKey: Starting RSA key generation.');
+    log(`generateRsaKey: Modulus (hex): ${data[0]}`);
+    log(`generateRsaKey: Exponent (hex): ${data[1]}`);
     // Convert the modulus and exponent from hex strings to BN (Big Number) objects
     const modulus = new bn_js_1.default(data[0], 16);
     const exponent = parseInt(data[1], 16);
     if (isNaN(exponent)) {
-        console.error('generateRsaKey: Error parsing exponent.');
+        err('generateRsaKey: Error parsing exponent.');
         return null;
     }
     // Encode the modulus and exponent into ASN.1 DER format
@@ -63,7 +66,7 @@ function generateRsaKey(data) {
         format: 'der',
         type: 'pkcs1',
     });
-    console.log(`generateRsaKey: Generated RSA Public Key (DER, hex):\n${key
+    log(`generateRsaKey: Generated RSA Public Key (DER, hex):\n${key
         .export({ format: 'der', type: 'pkcs1' })
         .toString('hex')}`);
     return key;
@@ -77,9 +80,9 @@ function generateRsaKey(data) {
  */
 function encryptRsa(msg, publicKey) {
     var _a;
-    console.log('encryptRsa: Starting RSA encryption.');
-    console.log(`encryptRsa: Message to encrypt: ${msg}`);
-    console.log(`encryptRsa: Key: ${publicKey
+    log('encryptRsa: Starting RSA encryption.');
+    log(`encryptRsa: Message to encrypt: ${msg}`);
+    log(`encryptRsa: Key: ${publicKey
         .export({ format: 'der', type: 'pkcs1' })
         .toString('hex')}`);
     try {
@@ -97,11 +100,11 @@ function encryptRsa(msg, publicKey) {
         }, messageBuffer);
         // Convert the encrypted message to a hexadecimal string
         const encryptedMsg = cipher.toString('hex');
-        console.log(`encryptRsa: Encrypted message (hex): ${encryptedMsg}`);
+        log(`encryptRsa: Encrypted message (hex): ${encryptedMsg}`);
         return encryptedMsg;
     }
-    catch (err) {
-        console.error(`encryptRsa: Error encrypting message: ${err}`);
+    catch (e) {
+        err(`encryptRsa: Error encrypting message: ${e}`);
         return '';
     }
 }
