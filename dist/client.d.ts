@@ -2,11 +2,11 @@ import { KeyObject } from 'crypto';
 import { AxiosInstance } from 'axios';
 import Deco from './deco';
 import { AESKey } from './utils/aes';
-interface ErrorResponse {
+export interface ErrorResponse {
     errorcode: string;
     success: boolean;
 }
-interface ClientListResponse {
+export interface ClientListResponse {
     error_code: number;
     result: {
         client_list: Array<{
@@ -29,7 +29,7 @@ interface ClientListResponse {
         }>;
     };
 }
-interface WLANNetworkResponse {
+export interface WLANNetworkResponse {
     error_code: number;
     result: {
         band5_1: {
@@ -77,7 +77,28 @@ interface WLANNetworkResponse {
         };
     };
 }
-interface WANResponse {
+export interface Band {
+    backhaul: {
+        channel: number;
+    };
+    guest: {
+        password: string;
+        ssid: string;
+        vlan_id: number;
+        enable: boolean;
+        need_set_vlan: boolean;
+    };
+    host: {
+        password: string;
+        ssid: string;
+        channel: number;
+        enable: boolean;
+        mode: string;
+        channel_width: string;
+        enable_hide_ssid: boolean;
+    };
+}
+export interface WANResponse {
     error_code: number;
     result: {
         wan: {
@@ -102,7 +123,7 @@ interface WANResponse {
         };
     };
 }
-interface DeviceListResponse {
+export interface DeviceListResponse {
     error_code: number;
     result: {
         device_list: Array<{
@@ -142,13 +163,13 @@ interface DeviceListResponse {
         }>;
     };
 }
-interface AdvancedResponse {
+export interface AdvancedResponse {
     error_code: number;
     result: {
         support_dfs: boolean;
     };
 }
-interface PerformanceResponse {
+export interface PerformanceResponse {
     error_code: number;
     result: {
         cpu_usage: number;

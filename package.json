@@ -6,7 +6,7 @@
   "bugs": {
     "url": "https://github.com/mathiastornblom/decoapiwrapper/issues"
   },
-  "version": "1.0.4",
+  "version": "1.0.5",
   "keywords": [],
   "author": "Mathias Törnblom",
   "license": "MIT",
@@ -27,7 +27,7 @@
     "@types/bn.js": "^5.1.5",
     "@types/debug": "^4.1.12",
     "@types/jest": "^29.5.12",
-    "@types/node": "^22.5.0",
+    "@types/node": "^22.5.1",
     "@types/ping": "^0.4.4",
     "@types/qs": "^6.9.15",
     "@types/tough-cookie": "^4.0.5",

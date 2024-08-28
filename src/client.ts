@@ -13,12 +13,12 @@ const log = debug('app:log');
 // Define a constant for the username to be used for authentication
 const userName = 'admin';
 
-interface ErrorResponse {
+export interface ErrorResponse {
   errorcode: string;
   success: boolean;
 }
 // Interface to define the structure of the response for client list
-interface ClientListResponse {
+export interface ClientListResponse {
   error_code: number;
   result: {
     client_list: Array<{
@@ -42,7 +42,7 @@ interface ClientListResponse {
   };
 }
 
-interface WLANNetworkResponse {
+export interface WLANNetworkResponse {
   error_code: number;
   result: {
     band5_1: {
@@ -91,7 +91,7 @@ interface WLANNetworkResponse {
   };
 }
 
-interface Band {
+export interface Band {
   backhaul: {
     channel: number;
   };
@@ -114,7 +114,7 @@ interface Band {
 }
 
 // Interface to define the structure of the response for WAN
-interface WANResponse {
+export interface WANResponse {
   error_code: number;
   result: {
     wan: {
@@ -141,7 +141,7 @@ interface WANResponse {
 }
 
 // Interface to define the structure of the response for device list
-interface DeviceListResponse {
+export interface DeviceListResponse {
   error_code: number;
   result: {
     device_list: Array<{
@@ -183,7 +183,7 @@ interface DeviceListResponse {
 }
 
 // Interface to define the structure of the response for advanced data
-interface AdvancedResponse {
+export interface AdvancedResponse {
   error_code: number;
   result: {
     support_dfs: boolean;
@@ -191,7 +191,7 @@ interface AdvancedResponse {
 }
 
 // Interface to define the structure of the response for performance data
-interface PerformanceResponse {
+export interface PerformanceResponse {
   error_code: number;
   result: {
     cpu_usage: number;
