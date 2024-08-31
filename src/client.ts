@@ -182,6 +182,27 @@ export interface DeviceListResponse {
   };
 }
 
+export interface InternetResponse {
+  error_code: number;
+  result: {
+    ipv6: {
+      connect_type: string;
+      auto_detect_type: string;
+      error_code: number;
+      inet_status: string;
+      dial_status: string;
+    };
+    ipv4: {
+      connect_type: string;
+      auto_detect_type: string;
+      error_code: number;
+      dial_status: string;
+      inet_status: string;
+    };
+    link_status: string;
+  };
+}
+
 // Interface to define the structure of the response for advanced data
 export interface AdvancedResponse {
   error_code: number;
@@ -560,6 +581,42 @@ export default class DecoAPIWraper {
         success: result.success,
       };
       err('client.ts: ' + 'WAN request failed:', errorResponse);
+      return errorResponse;
+    }
+
+    // If no error do respond with result
+    return result;
+  }
+  // Public method to retrieve Internt data
+  async getInternet(): Promise<InternetResponse | ErrorResponse> {
+    log('client.ts: ' + 'Requesting status data...');
+    const args = new EndpointArgs('internet');
+    const decoInstance = new Deco(
+      this.aes!,
+      this.hash,
+      this.rsa!,
+      this.sequence,
+      this.c,
+    );
+    const result = (await decoInstance.doEncryptedPost(
+      `;stok=${this.stok}/admin/network`,
+      args,
+      Buffer.from(JSON.stringify({ operation: 'read' })),
+      false,
+    )) as any;
+
+    // Chech if error
+    if (
+      result &&
+      typeof result === 'object' &&
+      'errorcode' in result &&
+      'success' in result
+    ) {
+      const errorResponse: ErrorResponse = {
+        errorcode: result.errorcode,
+        success: result.success,
+      };
+      err('client.ts: ' + 'Internet request failed:', errorResponse);
       return errorResponse;
     }
 

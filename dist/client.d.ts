@@ -163,6 +163,26 @@ export interface DeviceListResponse {
         }>;
     };
 }
+export interface InternetResponse {
+    error_code: number;
+    result: {
+        ipv6: {
+            connect_type: string;
+            auto_detect_type: string;
+            error_code: number;
+            inet_status: string;
+            dial_status: string;
+        };
+        ipv4: {
+            connect_type: string;
+            auto_detect_type: string;
+            error_code: number;
+            dial_status: string;
+            inet_status: string;
+        };
+        link_status: string;
+    };
+}
 export interface AdvancedResponse {
     error_code: number;
     result: {
@@ -198,6 +218,7 @@ export default class DecoAPIWraper {
     getWLAN(): Promise<WLANNetworkResponse | ErrorResponse>;
     getLAN(): Promise<any>;
     getWAN(): Promise<WANResponse | ErrorResponse>;
+    getInternet(): Promise<InternetResponse | ErrorResponse>;
     getModel(): Promise<any | ErrorResponse>;
     getEnviroment(): Promise<any | ErrorResponse>;
     getStatus(): Promise<any | ErrorResponse>;

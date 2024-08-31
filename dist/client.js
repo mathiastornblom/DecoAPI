@@ -261,6 +261,29 @@ class DecoAPIWraper {
             return result;
         });
     }
+    // Public method to retrieve Internt data
+    getInternet() {
+        return __awaiter(this, void 0, void 0, function* () {
+            log('client.ts: ' + 'Requesting status data...');
+            const args = new EndpointArgs('internet');
+            const decoInstance = new deco_1.default(this.aes, this.hash, this.rsa, this.sequence, this.c);
+            const result = (yield decoInstance.doEncryptedPost(`;stok=${this.stok}/admin/network`, args, Buffer.from(JSON.stringify({ operation: 'read' })), false));
+            // Chech if error
+            if (result &&
+                typeof result === 'object' &&
+                'errorcode' in result &&
+                'success' in result) {
+                const errorResponse = {
+                    errorcode: result.errorcode,
+                    success: result.success,
+                };
+                err('client.ts: ' + 'Internet request failed:', errorResponse);
+                return errorResponse;
+            }
+            // If no error do respond with result
+            return result;
+        });
+    }
     // Public method to retrieve enviromet data
     getModel() {
         return __awaiter(this, void 0, void 0, function* () {

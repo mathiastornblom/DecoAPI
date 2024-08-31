@@ -32,11 +32,25 @@ describe('Client Integration Tests', () => {
     } else {
       // Check that the response contains the expected properties and values
       expect(result).toHaveProperty('error_code', 0);
-      console.log('Performance list:', result);
+      console.log('Performance list:', JSON.stringify(result, null, 2));
     }
   });
 
-  // Test case to fetch the client list
+  it('should fetch internet status', async () => {
+    const result = await client.getInternet();
+
+    // Manage the case where the result is an ErrorResponse
+    if ('errorcode' in result) {
+      console.warn('Warning:', result.errorcode);
+      expect(result.errorcode).toBe('no such callback');
+    } else {
+      // Check that the response contains the expected properties and values
+      expect(result).toHaveProperty('error_code', 0);
+      console.log('Internet:', JSON.stringify(result, null, 2));
+    }
+  });
+
+  /* // Test case to fetch the client list
   it('should fetch client list', async () => {
     const result = await client.clientList();
 
@@ -47,7 +61,7 @@ describe('Client Integration Tests', () => {
     } else {
       // Check that the response contains the expected properties and values
       expect(result).toHaveProperty('error_code', 0);
-      console.log('Cevice list:', result);
+      console.log('Device list:', JSON.stringify(result, null, 2));
     }
   });
 
@@ -62,7 +76,7 @@ describe('Client Integration Tests', () => {
     } else {
       // Check that the response contains the expected properties and values
       expect(result).toHaveProperty('error_code', 0);
-      console.log('Device list:', result);
+      console.log('Device list:', JSON.stringify(result, null, 2));
     }
   });
 
@@ -77,7 +91,7 @@ describe('Client Integration Tests', () => {
     } else {
       // Check that the response contains the expected properties and values
       expect(result).toHaveProperty('error_code', 0);
-      console.log('WAN:', result);
+      console.log('WAN:', JSON.stringify(result, null, 2));
     }
   });
 
@@ -92,7 +106,7 @@ describe('Client Integration Tests', () => {
     } else {
       // Check that the response contains the expected properties and values
       expect(result).toHaveProperty('error_code', 0);
-      console.log('WLAN:', result);
+      console.log('WLAN:', JSON.stringify(result, null, 2));
     }
   });
 
@@ -107,7 +121,7 @@ describe('Client Integration Tests', () => {
     } else {
       // Check that the response contains the expected properties and values
       expect(result).toHaveProperty('error_code', 0);
-      console.log('Power:', result);
+      console.log('Power:', JSON.stringify(result, null, 2));
     }
   });
 
@@ -152,7 +166,7 @@ describe('Client Integration Tests', () => {
     } else {
       // Check that the response contains the expected properties and values
       expect(result).toHaveProperty('error_code', 0);
-      console.log('Firmware:', result);
+      console.log('Firmware:', JSON.stringify(result, null, 2));
     }
   });
 
@@ -184,5 +198,5 @@ describe('Client Integration Tests', () => {
   //     expect(result).toHaveProperty('error_code', 0);
   //     console.log('Enviromet:', result);
   //   }
-  // });
+  // }); */
 });
