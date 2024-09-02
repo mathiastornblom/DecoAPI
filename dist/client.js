@@ -21,8 +21,8 @@ const aes_1 = require("./utils/aes");
 const axios_cookiejar_support_1 = require("axios-cookiejar-support");
 const tough_cookie_1 = require("tough-cookie");
 const debug_1 = require("debug");
-const err = (0, debug_1.debug)('app:error');
-const log = (0, debug_1.debug)('app:log');
+const err = (0, debug_1.debug)('decoapiwrapper:error');
+const log = (0, debug_1.debug)('decoapiwrapper:log');
 // Define a constant for the username to be used for authentication
 const userName = 'admin';
 // Class to handle endpoint arguments and query parameters

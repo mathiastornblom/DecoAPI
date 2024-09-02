@@ -2,8 +2,8 @@ import crypto, { createPublicKey, KeyObject } from 'crypto';
 import * as asn1 from 'asn1.js';
 import BN from 'bn.js';
 import { debug } from 'debug';
-const err = debug('app:error');
-const log = debug('app:log');
+const err = debug('decoapiwrapper:rsa:error');
+const log = debug('decoapiwrapper:rsa:log');
 
 // Define the ASN.1 structure for an RSA public key
 const RSAPublicKeyASN = asn1.define('RSAPublicKey', function (this: any) {

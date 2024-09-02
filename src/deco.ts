@@ -9,8 +9,8 @@ import { AxiosInstance } from 'axios';
 import { KeyObject } from 'crypto';
 import { url } from 'inspector';
 import { debug } from 'debug';
-const err = debug('app:error');
-const log = debug('app:log');
+const err = debug('decoapiwrapper:deco:error');
+const log = debug('decoapiwrapper:deco:log');
 
 // Buffer for the default body used in read operations
 const readBody = Buffer.from(JSON.stringify({ operation: 'read' }));

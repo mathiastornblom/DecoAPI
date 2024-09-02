@@ -13,8 +13,8 @@ const rsa_1 = require("./utils/rsa");
 const aes_1 = require("./utils/aes");
 const inspector_1 = require("inspector");
 const debug_1 = require("debug");
-const err = (0, debug_1.debug)('app:error');
-const log = (0, debug_1.debug)('app:log');
+const err = (0, debug_1.debug)('decoapiwrapper:deco:error');
+const log = (0, debug_1.debug)('decoapiwrapper:deco:log');
 // Buffer for the default body used in read operations
 const readBody = Buffer.from(JSON.stringify({ operation: 'read' }));
 // Deco class handles encryption, decryption, and communication with the server

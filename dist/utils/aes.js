@@ -8,8 +8,8 @@ exports.AES128Encrypt = AES128Encrypt;
 exports.AES128Decrypt = AES128Decrypt;
 const crypto_1 = __importDefault(require("crypto"));
 const debug_1 = require("debug");
-const err = (0, debug_1.debug)('app:error');
-const log = (0, debug_1.debug)('app:log');
+const err = (0, debug_1.debug)('decoapiwrapper:aes:error');
+const log = (0, debug_1.debug)('decoapiwrapper:aes:log');
 // Custom error messages for PKCS7 padding errors
 const ErrInvalidBlockSize = new Error('invalid blocksize');
 const ErrInvalidPKCS7Data = new Error('invalid PKCS7 data (empty or not padded)');

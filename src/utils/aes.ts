@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { debug } from 'debug';
-const err = debug('app:error');
-const log = debug('app:log');
+const err = debug('decoapiwrapper:aes:error');
+const log = debug('decoapiwrapper:aes:log');
 
 // Interface to define the structure of an AES key and IV
 export interface AESKey {

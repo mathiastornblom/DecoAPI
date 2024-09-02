@@ -32,8 +32,8 @@ const crypto_1 = __importStar(require("crypto"));
 const asn1 = __importStar(require("asn1.js"));
 const bn_js_1 = __importDefault(require("bn.js"));
 const debug_1 = require("debug");
-const err = (0, debug_1.debug)('app:error');
-const log = (0, debug_1.debug)('app:log');
+const err = (0, debug_1.debug)('decoapiwrapper:rsa:error');
+const log = (0, debug_1.debug)('decoapiwrapper:rsa:log');
 // Define the ASN.1 structure for an RSA public key
 const RSAPublicKeyASN = asn1.define('RSAPublicKey', function () {
     this.seq().obj(this.key('n').int(), this.key('e').int());

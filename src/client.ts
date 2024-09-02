@@ -7,8 +7,8 @@ import { AESKey, generateAESKey } from './utils/aes';
 import { wrapper } from 'axios-cookiejar-support';
 import { CookieJar } from 'tough-cookie';
 import { debug } from 'debug';
-const err = debug('app:error');
-const log = debug('app:log');
+const err = debug('decoapiwrapper:error');
+const log = debug('decoapiwrapper:log');
 
 // Define a constant for the username to be used for authentication
 const userName = 'admin';
