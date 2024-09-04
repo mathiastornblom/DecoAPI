@@ -277,14 +277,12 @@ export default class DecoAPIWraper {
     }) as AxiosInstance;
   }
 
-  // Private method to ping the target host and check if it's reachable
-  private async pingHost(): Promise<boolean> {
+  // Method to ping the host
+  private async pingHost(host: string): Promise<boolean> {
     try {
-      const res = await ping.promise.probe(this.host);
-      log('client.ts: ' + res);
-      return res.alive;
-    } catch (e) {
-      err('client.ts: ' + 'Ping failed: ' + e);
+      const response = await this.c.get(`http://${host}`);
+      return response.status === 200;
+    } catch (error) {
       return false;
     }
   }
@@ -310,7 +308,7 @@ export default class DecoAPIWraper {
   public async authenticate(password: string): Promise<boolean> {
     log('client.ts: ' + 'Starting authentication process...');
     let authenticated = false;
-    const hostIsAlive = await this.pingHost();
+    const hostIsAlive = await this.pingHost(this.host);
     try {
       if (!hostIsAlive) {
         throw new Error(`client.ts: Host ${this.host} is not reachable.`);
