@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const crypto_1 = __importDefault(require("crypto"));
 const axios_1 = __importDefault(require("axios"));
-const ping_1 = __importDefault(require("ping"));
 const deco_1 = __importDefault(require("./deco"));
 const rsa_1 = require("./utils/rsa");
 const aes_1 = require("./utils/aes");
@@ -57,16 +56,14 @@ class DecoAPIWraper {
             jar: cookieJar,
         });
     }
-    // Private method to ping the target host and check if it's reachable
-    pingHost() {
+    // Method to ping the host
+    pingHost(host) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const res = yield ping_1.default.promise.probe(this.host);
-                log('client.ts: ' + res);
-                return res.alive;
+                const response = yield this.c.get(`http://${host}`);
+                return response.status === 200;
             }
-            catch (e) {
-                err('client.ts: ' + 'Ping failed: ' + e);
+            catch (error) {
                 return false;
             }
         });
@@ -84,7 +81,7 @@ class DecoAPIWraper {
         return __awaiter(this, void 0, void 0, function* () {
             log('client.ts: ' + 'Starting authentication process...');
             let authenticated = false;
-            const hostIsAlive = yield this.pingHost();
+            const hostIsAlive = yield this.pingHost(this.host);
             try {
                 if (!hostIsAlive) {
                     throw new Error(`client.ts: Host ${this.host} is not reachable.`);
@@ -136,8 +133,13 @@ class DecoAPIWraper {
                 try {
                     const result = yield this.decoInstance.doEncryptedPost(';stok=/login', args, Buffer.from(loginJSON), true, sessionKey, this.sequence);
                     this.stok = result.result.stok;
-                    log('client.ts: ' + `Login successful. STOK: ${this.stok}`);
-                    authenticated = true;
+                    if (!this.stok) {
+                        throw new Error('client.ts: ' + 'Failed to retrieve STok.');
+                    }
+                    else {
+                        log('client.ts: ' + `Login successful. STOK: ${this.stok}`);
+                        authenticated = true;
+                    }
                 }
                 catch (e) {
                     log('client.ts: ' + e);
