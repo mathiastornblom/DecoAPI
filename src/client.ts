@@ -387,8 +387,12 @@ export default class DecoAPIWraper {
         );
 
         this.stok = result.result.stok;
-        log('client.ts: ' + `Login successful. STOK: ${this.stok}`);
-        authenticated = true;
+        if (!this.stok) {
+          throw new Error('client.ts: ' + 'Failed to retrieve STok.');
+        } else {
+          log('client.ts: ' + `Login successful. STOK: ${this.stok}`);
+          authenticated = true;
+        }
       } catch (e) {
         log('client.ts: ' + e);
         return authenticated;
